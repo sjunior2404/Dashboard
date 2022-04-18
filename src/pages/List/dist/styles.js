@@ -1,0 +1,12 @@
+"use strict";
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+exports.__esModule = true;
+exports.Filters = exports.Content = exports.Container = void 0;
+var styled_components_1 = require("styled-components");
+exports.Container = styled_components_1["default"].div(templateObject_1 || (templateObject_1 = __makeTemplateObject([""], [""])));
+exports.Content = styled_components_1["default"].div(templateObject_2 || (templateObject_2 = __makeTemplateObject([""], [""])));
+exports.Filters = styled_components_1["default"].div(templateObject_3 || (templateObject_3 = __makeTemplateObject(["\n    width:100%;\n    display:flex;\n    justify-content:center;\n    margin-bottom:30px;\n\n    .tag-filter{\n        font-size: 18px;\n        font-weight:500;\n        background:none;\n        color:", ";\n\n        margin:0 10px;\n\n        transition:opacity .3s;\n\n        :hover{\n            opacity:.7;\n        }\n        \n    }\n    .tag-filter-recurrent::after{\n            content:'';\n            display:block;\n            width:55px;\n            margin: 0 auto;\n            border-bottom:10px solid ", "\n        }\n    .tag-filter-eventual::after{\n            content:'';\n            display:block;\n            width:55px;\n            margin: 0 auto;\n            border-bottom:10px solid ", "\n        }\n"], ["\n    width:100%;\n    display:flex;\n    justify-content:center;\n    margin-bottom:30px;\n\n    .tag-filter{\n        font-size: 18px;\n        font-weight:500;\n        background:none;\n        color:", ";\n\n        margin:0 10px;\n\n        transition:opacity .3s;\n\n        :hover{\n            opacity:.7;\n        }\n        \n    }\n    .tag-filter-recurrent::after{\n            content:'';\n            display:block;\n            width:55px;\n            margin: 0 auto;\n            border-bottom:10px solid ", "\n        }\n    .tag-filter-eventual::after{\n            content:'';\n            display:block;\n            width:55px;\n            margin: 0 auto;\n            border-bottom:10px solid ", "\n        }\n"])), function (props) { return props.theme.colors.white; }, function (props) { return props.theme.colors.warning; }, function (props) { return props.theme.colors.success; });
+var templateObject_1, templateObject_2, templateObject_3;
