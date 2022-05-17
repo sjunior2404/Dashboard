@@ -6,6 +6,8 @@ import HistoryFinanceCard from "../../components/HistoryFinanceCard";
 
 import gains from '../../repositories/gains';
 import expenses from '../../repositories/expenses';
+import FormatCurrency from '../../utils/formatCurrency';
+import FormatDate from '../../utils/formatDate';
 
 
 import { Container, Content, Filters } from "./styles";
@@ -20,7 +22,7 @@ interface IRouteParams{
 
 interface IData{
     id:string;
-    description:string;
+    description:string | boolean;
     amountFormatted:string;
     frequency:string;
     dataFormatted:string;
@@ -31,6 +33,8 @@ interface IData{
 const List: React.FC<IRouteParams> = ({ match }) =>{
 
     const [data, setData] = useState<IData[]>([]);
+    const [monthSelected, setMonthSelected] = useState<number>(String(new Date().getMonth() + 1));
+    const [yearSelected, setYearSelected] = useState<number>(String(new Date().getFullYear()));
 
     const { type } = match.params;
 
@@ -60,23 +64,31 @@ const List: React.FC<IRouteParams> = ({ match }) =>{
     ];
 
     useEffect(() => {
-        const response = listData.map(item => {
-            return{
-                id:String(Math.random() * data.length),
-                description:item.description,
-                amountFormatted:item.amount,
-                frequency:item.frequency,
-                dataFormatted:item.date,
-                tagColor:item.frequency === 'recorrente' ? '#4E41F0' : '#E44C4E' 
+        const filteredData = listData.map(item => {
+
+            const date = new Date(item.date);
+            const month = String (date.getMonth() + 1);
+            const year = String (date.getFullYear());
+
+            return month === monthSelected && year === yearSelected;
+        });
+
+        const formattedData = filteredData.map(item => {
+            return {
+                description: item.description,
+                amountFormatted: FormatCurrency(Number(item.amount)),
+                frequency: item.frequency,
+                dateFormatted: FormatDate(item.date),
+                tagColor: item.frequency === 'recorrente' ? '#4E41F0' : '#E44C4E',
             }
-        })
-        setData(response); 
+        });
+        setData(formattedData); 
     }, []);
     return(
         <Container>
             <ContentHeader title={title} lineColor={ lineColor }>
-                    <SelectInput options={months} />
-                    <SelectInput options={years}/> 
+                    <SelectInput options={months} onChange={(e) => setMonthSelected(e.target.value)} defaultValue={monthSelected}/>
+                    <SelectInput options={years} onChange = {(e) => setYearSelected(e.target.value)} defaultValue={yearSelected}/> 
 
             </ContentHeader>
             <Filters>
