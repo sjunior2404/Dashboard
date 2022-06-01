@@ -1,16 +1,20 @@
-import React, {useMemo, useState, useEffect} from "react";
+import React, { useMemo, useState, useEffect } from 'react'
 
-import ContentHeader from "../../components/ContentHeader";
-import SelectInput from "../../components/SelectInput";
-import HistoryFinanceCard from "../../components/HistoryFinanceCard";
+import ContentHeader from '../../components/ContentHeader'
+import SelectInput from '../../components/SelectInput'
+import HistoryFinanceCard from '../../components/HistoryFinanceCard'
 
-import gains from '../../repositories/gains';
-import expenses from '../../repositories/expenses';
-import FormatCurrency from '../../utils/formatCurrency';
-import FormatDate from '../../utils/formatDate';
+import gains from '../../repositories/gains'
+import expenses from '../../repositories/expenses'
+import formatCurrency from '../../utils/formatCurrency'
+import formatDate from '../../utils/formatDate'
 
 
-import { Container, Content, Filters } from "./styles";
+import { 
+    Container, 
+    Content, 
+    Filters 
+} from "./styles";
 
 interface IRouteParams {
     match: {
@@ -32,13 +36,14 @@ interface IData {
 const List: React.FC<IRouteParams> = ({ match }) => {
 
     const [data, setData] = useState<IData[]>([]);
-    const [monthSelected, setMonthSelected] = useState<number>(new Date().getMonth() + 1);
-    const [yearSelected, setYearSelected] = useState<number>(new Date().getFullYear());
+    const [monthSelected, setMonthSelected] = useState<string>(String(new Date().getMonth() + 1));
+    const [yearSelected, setYearSelected] = useState<string>(String(new Date().getFullYear()));
 
-    const movimentType = match.params.type;
+    const {type} = match.params;
+
 
     const pageData = useMemo(() => {
-        return movimentType === 'entry-balance' ?
+        return type === 'entry-balance' ?
             {
                 title: 'Entradas',
                 lineColor: '#4E41F0',
@@ -50,19 +55,22 @@ const List: React.FC<IRouteParams> = ({ match }) => {
                 lineColor: '#E44C4E',
                 data: expenses
             }       
-    },[movimentType]);
+    },[type]);
+
+  
 
     const lineColor = useMemo(() => {
-        return movimentType === 'entry-balance' ? '#F7931B' : '#E44C4E'
-    }, [movimentType]);
+        return type === 'entry-balance' ? '#F7931B' : '#E44C4E'
+    }, [type]);
 
 
     const listData = useMemo(() => {
-        return movimentType === 'entry-balance' ? gains : expenses;
-    },[movimentType]);
+        return type === 'entry-balance' ? gains : expenses;
+    },[type]);
+
 
     const months = [
-        {value:'7', label:"Julho"},
+        {value:'6', label:"Junho"},
         {value:'8', label:"Agosto"},
         {value:'9', label:"Setembro"}
     ];
@@ -70,28 +78,47 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     const years = [        
         {value:2022, label:2022},
         {value:2019, label:2019},
-        {value:2018, label:2018}
+        {value:2018, label:2018},
     ];
 
     useEffect(() => {
-       const response = listData.map(item => {
+        const filteredData = listData.filter(item =>{
+            const date = new Date(item.date);
+            const month = String(date.getMonth());
+            const year = String(date.getFullYear());
+
+            return month === monthSelected && year === yearSelected
+        });
+        
+       const formattedData = filteredData.map(item => {
             return {
                 id:String(Math.random() * data.length),
                 description: item.description,
-                amountFormatted: FormatCurrency(Number(item.amount)),
+                amountFormatted: formatCurrency(Number(item.amount)),
                 frequency: item.frequency,
-                dataFormatted:FormatDate(item.date),
+                dataFormatted:formatDate(item.date),
                 tagColor:item.frequency === 'recorrente'?'#4E41f0' : '#E44C4E'
             }
         })
         
-        setData(response);
-    },[]); 
+        setData(formattedData);
+    },[monthSelected, yearSelected, data.length, listData]); 
+
+
     return(
         <Container>
-            <ContentHeader title={pageData.title} lineColor={ lineColor }>
-                    <SelectInput options={months} onChange={(e)=> console.log(e.target.value)} />
-                    <SelectInput options={years}onChange={(e)=> console.log(e.target.value)} /> 
+            <ContentHeader title={pageData.title} lineColor={lineColor}>
+            <SelectInput 
+            options={months} 
+            onChange={ e => setMonthSelected(e.target.value)} 
+            defaultValue={monthSelected}
+            />
+
+            <SelectInput 
+            options={years} 
+            onChange={ e => setYearSelected(e.target.value)} 
+            defaultValue={yearSelected}    
+           />
 
             </ContentHeader>
             <Filters>
@@ -109,17 +136,21 @@ const List: React.FC<IRouteParams> = ({ match }) => {
                 </button>
             </Filters>
             <Content>
-                {
-                data.map(item => (    
-                    <HistoryFinanceCard
-                        key = {item.id}
-                        tagColor = {item.tagColor}
+                 { data.map(item => (
+
+                    <HistoryFinanceCard 
+
+                        key={item.id}
+                        tagColor={item.tagColor}
                         title={item.description}
                         subtitle={item.dataFormatted}
                         amount={item.amountFormatted}
+
                     />
-                ))
-            }
+
+                 ))
+
+                 }
             </Content>
         </Container>
     )
